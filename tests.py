@@ -2,6 +2,7 @@ import unittest
 
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
+from functions.write_file_content import write_file
 from config import MAX_CHARS
 
 class TestGetFilesInfo(unittest.TestCase):
@@ -58,6 +59,24 @@ class TestGetFileContent(unittest.TestCase):
 
     def test_unallowed_file(self):
         result = get_file_content("calculator", "/bin/cat")
+        print(result)
+        self.assertTrue(result.startswith("Error:"), "Should return error")
+
+class TestWriteFile(unittest.TestCase):
+    
+    def test_write_file(self):
+        result = write_file("calculator", "lorem2.txt", "wait, this isn't lorem ipsum")
+        print(result)
+        result = write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet")
+        print(result)
+
+    def test_unallowed_file(self):
+        result = write_file("calculator", "/tmp/temp.txt", "wait, this isn't lorem ipsum")
+        print(result)
+        self.assertTrue(result.startswith("Error:"), "Should return error")
+    
+    def test_non_file(self):
+        result = write_file("calculator", "pkg/", "lorem ipsum dolor sit amet")
         print(result)
         self.assertTrue(result.startswith("Error:"), "Should return error")
 
