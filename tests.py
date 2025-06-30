@@ -3,6 +3,7 @@ import unittest
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file_content import write_file
+from functions.run_python import run_python_file
 from config import MAX_CHARS
 
 class TestGetFilesInfo(unittest.TestCase):
@@ -77,6 +78,24 @@ class TestWriteFile(unittest.TestCase):
     
     def test_non_file(self):
         result = write_file("calculator", "pkg/", "lorem ipsum dolor sit amet")
+        print(result)
+        self.assertTrue(result.startswith("Error:"), "Should return error")
+
+class TestRunPython(unittest.TestCase):
+    
+    def test_run_file(self):
+        result = run_python_file("calculator", "main.py")
+        print(result)
+        result = run_python_file("calculator", "tests.py")
+        print(result)
+
+    def test_unallowed_file(self):
+        result = run_python_file("calculator", "../main.py")
+        print(result)
+        self.assertTrue(result.startswith("Error:"), "Should return error")
+    
+    def test_non_file(self):
+        result = run_python_file("calculator", "nonexistent.py")
         print(result)
         self.assertTrue(result.startswith("Error:"), "Should return error")
 

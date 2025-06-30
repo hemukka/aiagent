@@ -16,4 +16,4 @@ def write_file(working_directory, file_path, content):
         return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     
     except Exception as e:
-        return f'Error creating the file "{file_path}: {e}'
+        return f'Error creating the file "{file_path}": {e}'
