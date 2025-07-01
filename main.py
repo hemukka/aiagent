@@ -29,6 +29,12 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)])
     ]
 
+    for i in range(20):
+        if generate_content(client, messages, verbose):
+            break
+
+
+def generate_content(client, messages, verbose):
     response = client.models.generate_content(
         model="gemini-2.0-flash-001",
         contents=messages,
@@ -42,9 +48,12 @@ def main():
         print("Response tokens: ", response.usage_metadata.candidates_token_count)
 
     if not response.function_calls:
-        print("Response:")
+        print("Final response:")
         print(response.text)
-        return
+        return True
+
+    for candidate in response.candidates:
+        messages.append(candidate.content)
 
     function_responses = []
     for function_call_part in response.function_calls:
@@ -57,6 +66,7 @@ def main():
         if verbose:
             print(f"-> {function_call_result.parts[0].function_response.response}")
         function_responses.append(function_call_result.parts[0])
+        messages.append(function_call_result)
     
     if not function_responses:
         raise Exception("no function responses generated, exiting")
