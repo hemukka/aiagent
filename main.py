@@ -46,6 +46,7 @@ def generate_content(client, messages, verbose):
     if verbose and response.usage_metadata is not None:
         print("Prompt tokens: ", response.usage_metadata.prompt_token_count)
         print("Response tokens: ", response.usage_metadata.candidates_token_count)
+        # print("candidates: ", len(response.candidates))
 
     if not response.function_calls:
         print("Final response:")
@@ -54,7 +55,11 @@ def generate_content(client, messages, verbose):
 
     for candidate in response.candidates:
         messages.append(candidate.content)
+        for part in candidate.content.parts:
+            if part.text:
+                print("Response: ", part.text)
 
+    # print("function calls: ", len(response.function_calls))
     function_responses = []
     for function_call_part in response.function_calls:
         function_call_result = call_function(function_call_part, verbose)
@@ -66,10 +71,18 @@ def generate_content(client, messages, verbose):
         if verbose:
             print(f"-> {function_call_result.parts[0].function_response.response}")
         function_responses.append(function_call_result.parts[0])
-        messages.append(function_call_result)
+        # messages.append(function_call_result)
     
     if not function_responses:
         raise Exception("no function responses generated, exiting")
+    
+    # merge function responses as parts in one Content object
+    messages.append(types.Content(
+        role="tool",
+        parts=[res for res in function_responses],
+    ))
+
+    # print("function responses: ", len(function_responses))
             
 
 if __name__ == "__main__":
